@@ -113,6 +113,138 @@
             margin-top: 20px;
             display: none;
         }
+        /* Global styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f2f2f2;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Make sure the body takes the full height of the viewport */
+}
+
+header {
+    background-color: #0A3D91; /* Dark blue for security and trust */
+    color: white;
+    padding: 20px;
+    text-align: center;
+    font-size: 1.8em;
+    font-weight: bold;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px;
+    flex-grow: 1; /* Allow the container to take remaining space */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Align the content to the top */
+}
+
+/* Logo and form sections */
+.logo {
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+    display: block;
+    margin-bottom: 20px;
+}
+
+/* Login container */
+.login-container {
+    background-color: #ffffff;
+    border: 1px solid #dcdcdc;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    border-radius: 8px;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+/* Responsive breakpoints */
+@media (max-width: 768px) {
+    /* On small screens, reduce padding and make the form more compact */
+    .container {
+        padding: 20px;
+    }
+
+    .login-container {
+        padding: 20px;
+        max-width: 90%; /* Take more space on smaller screens */
+    }
+
+    header {
+        font-size: 1.5em; /* Slightly smaller font for header */
+    }
+
+    .bank-info {
+        font-size: 0.9em; /* Adjust font size for bank info */
+        padding-bottom: 20px; /* Add spacing below the bank info */
+    }
+
+    footer {
+        font-size: 0.9em; /* Adjust font size for the footer */
+        padding: 15px 10px;
+    }
+}
+
+footer {
+    background-color: #0A3D91;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    position: relative;
+    width: 100%;
+    margin-top: auto; /* Push the footer to the bottom */
+    font-size: 1em;
+    padding: 15px 0;
+}
+
+.alert {
+    color: red;
+    text-align: center;
+    font-weight: bold;
+    display: none; /* Hidden by default */
+}
+
+.bank-info {
+    text-align: center;
+    font-size: 1.1em;
+    color: #0A3D91;
+    margin-top: 20px;
+}
+
+.error-message {
+    color: red;
+    text-align: center;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+.lockout-message {
+    color: orange;
+    text-align: center;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+.security-question {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.security-error {
+    color: red;
+    text-align: center;
+    font-weight: bold;
+    margin-top: 20px;
+    display: none;
+}
+
     </style>
 </head>
 <body>
