@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentinel National Bank - Dashboard</title>
+    <style>
+        /* Global styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #0A3D91;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+            text-align: center;
+        }
+        .dashboard-container {
+            background-color: #ffffff;
+            border: 1px solid #dcdcdc;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            border-radius: 8px;
+            margin: 0 auto;
+            max-width: 600px;
+        }
+        .user-info, .balance {
+            font-size: 1.2em;
+            margin: 20px 0;
+            color: #333;
+        }
+        .balance {
+            font-weight: bold;
+            color: #0A3D91;
+        }
+        .buttons {
+            margin-top: 20px;
+        }
+        .buttons button {
+            padding: 12px 24px;
+            font-size: 16px;
+            background-color: #0A3D91;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 10px;
+        }
+        .buttons button:hover {
+            background-color: #084a77;
+        }
+        /* Styling for the Sign Out button */
+        .sign-out-btn {
+            padding: 12px 24px;
+            font-size: 16px;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            transition: background-color 0.3s ease;
+        }
+        .sign-out-btn:hover {
+            background-color: #c0392b;
+        }
+        footer {
+            background-color: #0A3D91;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: absolute;
+            width: 100%;
+            bottom: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        Sentinel National Bank Dashboard
+    </header>
+
+    <div class="container">
+        <div class="dashboard-container">
+            <h2>Welcome, <span id="username"></span>!</h2>
+
+            <div class="user-info">
+                <p><strong>Username:</strong> <span id="displayUsername"></span></p>
+                <p><strong>Password:</strong> <span id="displayPassword"></span></p>
+            </div>
+
+            <div class="balance">
+                <p>Account Balance: $<span id="balance">1,000,000</span></p>
+            </div>
+
+            <div class="buttons">
+                <button onclick="transferMoney()">Transfer Money</button>
+                <button onclick="viewTransactionHistory()">View Transaction History</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sign Out button -->
+    <button class="sign-out-btn" onclick="signOut()">Sign Out</button>
+
+    <footer>
+        &copy; 2024 Sentinel National Bank. All rights reserved.
+    </footer>
+
+    <script>
+        // Placeholder variables for username and password
+        const username = sessionStorage.getItem("username") || "User";
+        const password = sessionStorage.getItem("password") || "password123";
+        
+        // Get balance from sessionStorage or set default value if not available
+        let balance = parseFloat(sessionStorage.getItem("balance")) || 1000000;
+
+        // Display the user's info on the dashboard
+        document.getElementById('username').textContent = username;
+        document.getElementById('displayUsername').textContent = username;
+        document.getElementById('displayPassword').textContent = password;
+        document.getElementById('balance').textContent = balance.toLocaleString();
+
+        // Navigate to transfer money page
+        function transferMoney() {
+            window.location.href = "transfer.html";
+        }
+
+        // Navigate to transaction history page
+        function viewTransactionHistory() {
+            window.location.href = "transaction_history.html";
+        }
+
+        // Sign out function: Clears sessionStorage and redirects to index.html
+        function signOut() {
+            sessionStorage.clear();  // Clears all session data
+            window.location.href = "index.html";  // Redirect to the login page
+        }
+    </script>
+
+</body>
+</html>

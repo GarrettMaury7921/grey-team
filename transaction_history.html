@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentinel National Bank - Transaction History</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #0A3D91;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+        .transaction-history {
+            background-color: #ffffff;
+            border: 1px solid #dcdcdc;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #dcdcdc;
+            text-align: left;
+        }
+        th {
+            background-color: #0A3D91;
+            color: white;
+        }
+        .button {
+            padding: 12px 24px;
+            font-size: 16px;
+            background-color: #0A3D91;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .button:hover {
+            background-color: #084a77;
+        }
+        footer {
+            background-color: #0A3D91;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            width: 100%;
+            position: absolute;
+            bottom: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        Transaction History
+    </header>
+
+    <div class="container">
+        <div class="transaction-history">
+            <h2>Your Recent Transactions</h2>
+
+            <table id="transactionTable">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Recipient</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Placeholder transactions will be replaced dynamically -->
+                </tbody>
+            </table>
+
+            <!-- Back to Dashboard button -->
+            <button class="button" onclick="goBackToDashboard()">Back to Dashboard</button>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2024 Sentinel National Bank. All rights reserved.
+    </footer>
+
+    <script>
+        // Function to dynamically add a transaction entry to the table
+        function addTransaction(date, recipient, amount, status) {
+            const table = document.getElementById("transactionTable").getElementsByTagName("tbody")[0];
+            const newRow = table.insertRow();
+            newRow.innerHTML = `<td>${date}</td><td>${recipient}</td><td>$${amount.toLocaleString()}</td><td>${status}</td>`;
+        }
+
+        // Load transaction history from sessionStorage
+        const transactionHistory = JSON.parse(sessionStorage.getItem("transactionHistory")) || [];
+
+        // Populate the transaction table with data from sessionStorage
+        transactionHistory.forEach(transaction => {
+            addTransaction(transaction.date, transaction.recipient, transaction.amount, transaction.status);
+        });
+
+        // Function to navigate back to the dashboard
+        function goBackToDashboard() {
+            window.location.href = 'dashboard.html';
+        }
+    </script>
+
+</body>
+</html>

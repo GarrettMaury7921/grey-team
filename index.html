@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentinel National Bank</title>
+    <style>
+        /* Global styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #0A3D91; /* Dark blue for security and trust */
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+        .login-container {
+            background-color: #ffffff;
+            border: 1px solid #dcdcdc;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            border-radius: 8px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #0A3D91;
+        }
+        input[type="text"], input[type="password"], input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+        input[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            background-color: #0A3D91;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #084a77;
+        }
+        footer {
+            background-color: #0A3D91;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: absolute;
+            width: 100%;
+            bottom: 0;
+        }
+        .alert {
+            color: red;
+            text-align: center;
+            font-weight: bold;
+            display: none; /* Hidden by default */
+        }
+        .bank-info {
+            text-align: center;
+            font-size: 1.1em;
+            color: #0A3D91;
+            margin-top: 20px;
+        }
+        .logo {
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+            display: block;
+            margin-bottom: 20px;
+        }
+        .error-message {
+            color: red;
+            text-align: center;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .lockout-message {
+            color: orange;
+            text-align: center;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .security-question {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .security-error {
+            color: red;
+            text-align: center;
+            font-weight: bold;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        Sentinel National Bank
+    </header>
+
+    <div class="container">
+        <!-- Logo Image -->
+        <img src="assets/vault.jpg" alt="Sentinel National Bank Logo" class="logo">
+
+        <div class="login-container" id="login-container">
+            <h2>Login to Your Account</h2>
+            
+            <!-- Error Message Div -->
+            <div class="alert" id="error-message">
+                <p class="error-message">Invalid credentials or CAPTCHA. Please try again.</p>
+            </div>
+            
+            <!-- Lockout Message Div -->
+            <div class="alert" id="lockout-message">
+                <p class="lockout-message">You are locked out. Please wait <span id="lockout-timer">3</span> seconds.</p>
+            </div>
+            
+            <!-- Login Form -->
+            <form action="#" method="post" id="login-form">
+                <input type="text" name="username" id="username" placeholder="Username" required>
+                <input type="password" name="password" id="password" placeholder="Password" required>
+                
+                <!-- CAPTCHA Image -->
+                <canvas id="captchaCanvas" width="200" height="80"></canvas>
+                <input type="text" name="captcha" id="captcha" placeholder="Enter CAPTCHA" required>
+                <button type="button" id="refreshCaptcha">Refresh CAPTCHA</button>
+
+                <input type="submit" value="Login">
+            </form>
+        </div>
+
+        <div class="security-question" id="security-question-container" style="display:none;">
+            <h2>Security Question</h2>
+            <p id="security-question-text"></p>
+            <form id="security-question-form">
+                <input type="text" id="security-answer" placeholder="Your Answer" required>
+                <input type="submit" value="Submit Answer">
+            </form>
+            <!-- Error Message for Security Question -->
+            <div class="security-error" id="security-error-message">
+                <p>Incorrect answer. Please try again.</p>
+            </div>
+        </div>
+
+        <div class="bank-info">
+            <p>Sentinel National Bank has been a trusted institution for over a century, committed to your financial security.</p>
+            <p>Our dedication to protecting your assets is paramount, even as we face sophisticated cyber threats every day.</p>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2024 Sentinel National Bank. All rights reserved.
+    </footer>
+
+    <script>
+        // Simulated valid credentials and security questions
+        const validUsername = "validUser";  // Simulated valid username for this example
+        const validPassword = "validPassword";  // Simulated valid password
+    
+        // Define multiple security questions and their answers
+        const securityQuestions = [
+            {
+                question: "The more of this there is, the less you see. What is it?",
+                answers: ["darkness"]
+            },
+            {
+                question: "David’s parents have three sons: Snap, Crackle, and what’s the name of the third son?",
+                answers: ["david", "David"]
+            },
+            {
+                question: "What OS is this server running on?",
+                answers: ["haiku", "haikuos", "Haiku", "HaikuOS"]
+            }
+        ];
+    
+        // Function to generate a random math question
+        function generateMathQuestion() {
+            const num1 = Math.floor(Math.random() * 10) + 1;  // Random number between 1 and 10
+            const num2 = Math.floor(Math.random() * 10) + 1;
+            const answer = (num1 + num2).toString();  // Convert to string for easy comparison
+            return { question: `What is ${num1} + ${num2}?`, answers: [answer] };
+        }
+    
+        // Add the generated math question to security questions
+        securityQuestions.push(generateMathQuestion());
+    
+        // Select a random security question from the list
+        let selectedQuestion = securityQuestions[Math.floor(Math.random() * securityQuestions.length)];
+    
+        // Variables to track lockout state
+        let failedAttempts = 0;
+        let lockoutTime = 0;
+        let lockoutInterval = null;
+        let isSecurityQuestion = false;
+    
+        // Function to generate a random CAPTCHA string
+        function generateCaptcha() {
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let captchaString = '';
+            for (let i = 0; i < 6; i++) {
+                captchaString += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            return captchaString;
+        }
+    
+        // Function to draw CAPTCHA on the canvas
+        function drawCaptcha(captchaText) {
+            const canvas = document.getElementById('captchaCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear previous image
+    
+            ctx.font = '30px Arial';
+            ctx.fillStyle = '#000000';
+            ctx.fillText(captchaText, 0, 50); // Draw the CAPTCHA string
+        }
+    
+        // Generate and display CAPTCHA when the page loads
+        let currentCaptcha = generateCaptcha();
+        drawCaptcha(currentCaptcha);
+    
+        // Event listener to refresh CAPTCHA when the button is clicked
+        document.getElementById('refreshCaptcha').addEventListener('click', function() {
+            currentCaptcha = generateCaptcha();
+            drawCaptcha(currentCaptcha);
+        });
+    
+        // Function to handle lockout countdown
+        function startLockout() {
+            document.getElementById('lockout-message').style.display = 'block';
+            document.getElementById('error-message').style.display = 'none';
+    
+            // Display lockout timer starting from lockoutTime
+            document.getElementById('lockout-timer').textContent = lockoutTime;
+            
+            lockoutInterval = setInterval(function() {
+                lockoutTime--;
+                document.getElementById('lockout-timer').textContent = lockoutTime;
+    
+                // When lockout time reaches 0, reset the state
+                if (lockoutTime <= 0) {
+                    clearInterval(lockoutInterval);
+                    document.getElementById('lockout-message').style.display = 'none';
+                }
+            }, 1000);
+        }
+    
+        // Login form submission handler
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+    
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const captcha = document.getElementById('captcha').value;
+    
+            // Check if the login credentials are correct
+            if (username === validUsername && password === validPassword && captcha === currentCaptcha) {
+                alert('Login successful!');
+                failedAttempts = 0;
+                lockoutTime = 0;
+                isSecurityQuestion = true;
+    
+                // Display the security question after successful login
+                displaySecurityQuestion();
+            } else {
+                document.getElementById('error-message').style.display = 'block';
+                failedAttempts++;
+    
+                // Increase lockout time after each failed attempt
+                lockoutTime = failedAttempts * 3;
+                if (lockoutTime === 3) {
+                    startLockout();
+                }
+    
+                // Refresh CAPTCHA after each failed attempt
+                currentCaptcha = generateCaptcha();
+                drawCaptcha(currentCaptcha);
+            }
+        });
+    
+        let currentQuestionIndex = 0;
+
+    function displaySecurityQuestion() {
+        document.getElementById('login-container').style.display = 'none';
+        document.getElementById('security-question-container').style.display = 'block';
+        document.getElementById('security-question-text').textContent = securityQuestions[currentQuestionIndex].question;
+    }
+
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const captcha = document.getElementById('captcha').value;
+
+        if (username === validUsername && password === validPassword && captcha === currentCaptcha) {
+            failedAttempts = 0;
+            lockoutTime = 0;
+            displaySecurityQuestion();
+        } else {
+            document.getElementById('error-message').style.display = 'block';
+            failedAttempts++;
+            lockoutTime = failedAttempts * 3;
+            if (lockoutTime === 3) {
+                startLockout();
+            }
+            currentCaptcha = generateCaptcha();
+            drawCaptcha(currentCaptcha);
+        }
+    });
+
+    document.getElementById('security-question-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const answer = document.getElementById('security-answer').value.toLowerCase();
+
+        if (securityQuestions[currentQuestionIndex].answers.includes(answer)) {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < securityQuestions.length) {
+                document.getElementById('security-answer').value = "";
+                document.getElementById('security-error-message').style.display = 'none';
+                displaySecurityQuestion();
+            } else {
+                alert('All Security Questions Answered Correctly! Access Granted.');
+                window.location.href = "/dashboard.html"; 
+            }
+        } else {
+            document.getElementById('security-error-message').style.display = 'block';
+        }
+    });
+    </script>
+    
+</body>
+</html>

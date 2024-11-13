@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentinel National Bank - Transfer Money</title>
+    <style>
+        /* Reuse the style definitions as per your provided code */
+        body { font-family: Arial, sans-serif; background-color: #f2f2f2; color: #333; margin: 0; padding: 0; }
+        header { background-color: #0A3D91; color: white; padding: 20px; text-align: center; font-size: 1.8em; font-weight: bold; }
+        .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 40px; text-align: center; }
+        .transfer-container { background-color: #ffffff; border: 1px solid #dcdcdc; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); padding: 40px; border-radius: 8px; margin: 0 auto; max-width: 600px; }
+        .balance-info, .user-info { font-size: 1.2em; margin: 20px 0; color: #333; }
+        .balance { font-weight: bold; color: #0A3D91; }
+        .alert { display: none; color: red; font-weight: bold; margin-top: 20px; }
+        input[type="number"], input[type="text"], input[type="submit"], .button { padding: 12px; font-size: 16px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc; width: 100%; }
+        input[type="submit"], .button { background-color: #0A3D91; color: white; cursor: pointer; }
+        input[type="submit"]:hover, .button:hover { background-color: #084a77; }
+
+        /* Styling for the "Go Back to Dashboard" button */
+        .go-back-btn {
+            padding: 12px 24px;
+            font-size: 16px;
+            background-color: #0A3D91;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .go-back-btn:hover {
+            background-color: #084a77;
+        }
+
+        footer { background-color: #0A3D91; color: white; text-align: center; padding: 10px; width: 100%; bottom: 0; }
+    </style>
+</head>
+<body>
+    <header>
+        Sentinel National Bank - Transfer Money
+    </header>
+    
+    <div class="container">
+        <div class="transfer-container">
+            <h2>Transfer Money</h2>
+            
+            <div class="balance-info">
+                <p><strong>Current Balance:</strong> $<span id="balance">1,000,000</span></p>
+            </div>
+    
+            <form id="transferForm">
+                <label for="recipient">Recipient Account:</label><br>
+                <input type="text" id="recipient" required><br><br>
+    
+                <label for="amount">Amount to Transfer:</label><br>
+                <input type="number" id="amount" required><br><br>
+    
+                <input type="submit" value="Transfer">
+            </form>
+    
+            <p id="suspiciousWarning" class="alert" style="display:none;">
+                Warning: This transfer is marked as suspicious due to the high amount requested. Cancelled.
+            </p>
+            
+            <p id="successMessage" class="alert" style="display:none; color: green;">
+                Transfer successful!
+            </p>
+    
+            <!-- Styled "Go Back to Dashboard" button -->
+            <button class="go-back-btn" onclick="window.location.href = 'dashboard.html';">Go Back to Dashboard</button>
+        </div>
+    </div>
+    
+    <footer>
+        &copy; 2024 Sentinel National Bank. All rights reserved.
+    </footer>
+    
+    <script>
+        let balance = parseFloat(sessionStorage.getItem("balance")) || 1000000;
+        document.getElementById('balance').textContent = balance.toLocaleString();
+    
+        document.getElementById('transferForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+    
+            const recipient = document.getElementById('recipient').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+    
+            let transactionStatus = "Completed";  // Default status
+    
+            if (amount > 20000) {
+                document.getElementById('suspiciousWarning').style.display = 'block';
+                document.getElementById('successMessage').style.display = 'none';
+                transactionStatus = "Cancelled";  // Set status to cancelled for suspicious transactions
+            } else {
+                if (amount > balance) {
+                    alert("Insufficient funds.");
+                    return;
+                }
+    
+                balance -= amount;
+                document.getElementById('balance').textContent = balance.toLocaleString();
+                sessionStorage.setItem("balance", balance);
+    
+                // Hide warning, show success
+                document.getElementById('suspiciousWarning').style.display = 'none';
+                document.getElementById('successMessage').style.display = 'block';
+            }
+    
+            // Add the transaction to the sessionStorage
+            let transactionHistory = JSON.parse(sessionStorage.getItem("transactionHistory")) || [];
+    
+            // Create the new transaction entry
+            const newTransaction = {
+                date: new Date().toISOString().split("T")[0], // YYYY-MM-DD
+                recipient: recipient,
+                amount: amount,
+                status: transactionStatus  // Include transaction status
+            };
+    
+            // Add the new transaction to the array
+            transactionHistory.push(newTransaction);
+    
+            // Save the updated history back into sessionStorage
+            sessionStorage.setItem("transactionHistory", JSON.stringify(transactionHistory));
+        });
+    </script>
+</body>
+</html>
