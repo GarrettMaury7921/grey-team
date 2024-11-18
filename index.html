@@ -309,8 +309,8 @@ footer {
 
     <script>
         // Simulated valid credentials and security questions
-        const validUsername = "validUser";  // Simulated valid username for this example
-        const validPassword = "validPassword";  // Simulated valid password
+        // const validUsername = "validUser";  // Simulated valid username for this example
+        // 74const validPassword = "validPassword";  // Simulated valid password
     
         // Define multiple security questions and their answers
         const securityQuestions = [
@@ -401,36 +401,53 @@ footer {
     
         // Login form submission handler
         document.getElementById('login-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-    
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const captcha = document.getElementById('captcha').value;
-    
-            // Check if the login credentials are correct
-            if (username === validUsername && password === validPassword && captcha === currentCaptcha) {
-                alert('Login successful!');
-                failedAttempts = 0;
-                lockoutTime = 0;
-                isSecurityQuestion = true;
-    
-                // Display the security question after successful login
-                displaySecurityQuestion();
-            } else {
-                document.getElementById('error-message').style.display = 'block';
-                failedAttempts++;
-    
-                // Increase lockout time after each failed attempt
-                lockoutTime = failedAttempts * 3;
-                if (lockoutTime === 3) {
-                    startLockout();
+        e.preventDefault();
+
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const captcha = document.getElementById('captcha').value;
+
+        // Validate the CAPTCHA on the frontend (this could also be done server-side)
+        if (username && password && captcha) {
+            // Send the login credentials to the server for validation
+            fetch('login.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password, captcha })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Login successful!');
+                    failedAttempts = 0;
+                    lockoutTime = 0;
+                    isSecurityQuestion = true;
+
+                    // Display the security question after successful login
+                    displaySecurityQuestion();
+                } else {
+                    document.getElementById('error-message').style.display = 'block';
+                    failedAttempts++;
+
+                    // Increase lockout time after each failed attempt
+                    lockoutTime = failedAttempts * 3;
+                    if (lockoutTime === 3) {
+                        startLockout();
+                    }
+
+                    // Refresh CAPTCHA after each failed attempt
+                    currentCaptcha = generateCaptcha();
+                    drawCaptcha(currentCaptcha);
                 }
-    
-                // Refresh CAPTCHA after each failed attempt
-                currentCaptcha = generateCaptcha();
-                drawCaptcha(currentCaptcha);
-            }
+            })
+            .catch(error => console.error('Error:', error));
+        } else {
+            document.getElementById('error-message').style.display = 'block';
+        }
         });
+
     
         let currentQuestionIndex = 0;
 

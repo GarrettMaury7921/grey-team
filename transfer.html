@@ -16,24 +16,8 @@
         input[type="number"], input[type="text"], input[type="submit"], .button { padding: 12px; font-size: 16px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc; width: 100%; }
         input[type="submit"], .button { background-color: #0A3D91; color: white; cursor: pointer; }
         input[type="submit"]:hover, .button:hover { background-color: #084a77; }
-
-        /* Styling for the "Go Back to Dashboard" button */
-        .go-back-btn {
-            padding: 12px 24px;
-            font-size: 16px;
-            background-color: #0A3D91;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: background-color 0.3s ease;
-        }
-
-        .go-back-btn:hover {
-            background-color: #084a77;
-        }
-
+        .go-back-btn { padding: 12px 24px; font-size: 16px; background-color: #0A3D91; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 20px; transition: background-color 0.3s ease; }
+        .go-back-btn:hover { background-color: #084a77; }
         footer { background-color: #0A3D91; color: white; text-align: center; padding: 10px; width: 100%; bottom: 0; }
     </style>
 </head>
@@ -57,12 +41,14 @@
                 <label for="amount">Amount to Transfer:</label><br>
                 <input type="number" id="amount" required><br><br>
             
+                <label for="note">Transfer Note (optional):</label><br>
+                <input type="text" id="note"><br><br>
+            
                 <input type="submit" value="Transfer">
             </form>
             
             <p id="errorMessage" class="alert" style="display:none; color: red;"></p>
             
-    
             <p id="suspiciousWarning" class="alert" style="display:none;">
                 Warning: This transfer is marked as suspicious due to the high amount requested. Cancelled.
             </p>
@@ -71,11 +57,7 @@
                 Transfer successful!
             </p>
     
-            <!-- Styled "Go Back to Dashboard" button -->
             <button class="go-back-btn" onclick="window.location.href = 'dashboard.html';">Go Back to Dashboard</button>
-
-            <p id="errorMessage" class="alert" style="display:none; color: red;"></p>
-            
         </div>
     </div>
     
@@ -84,6 +66,22 @@
     </footer>
     
     <script>
+        // Function to check if the user is logged in
+        function checkLoginStatus() {
+            const username = sessionStorage.getItem("username");
+            const password = sessionStorage.getItem("password");
+
+            if (!username || !password) {
+                window.location.href = "index.html";  // Redirect to login page
+            } else {
+                // You can display username or other info if needed
+                console.log("Logged in as: " + username);
+            }
+        }
+
+        // Call the login check on page load
+        checkLoginStatus();
+
         let balance = parseFloat(sessionStorage.getItem("balance")) || 1000000;
         document.getElementById('balance').textContent = balance.toLocaleString();
     
@@ -96,6 +94,7 @@
             const currentTime = Date.now(); // Get the current timestamp
             const recipient = document.getElementById('recipient').value;
             const amount = parseFloat(document.getElementById('amount').value);
+            const note = document.getElementById('note').value;
             const errorElement = document.getElementById('errorMessage');
     
             // Clear any previous error messages
@@ -109,7 +108,7 @@
     
             let transactionStatus = "Completed"; // Default status
     
-            if (amount > 25000) {
+            if (amount > 2500) {
                 document.getElementById('suspiciousWarning').style.display = 'block';
                 document.getElementById('successMessage').style.display = 'none';
                 transactionStatus = "Cancelled"; // Set status to cancelled for suspicious transactions
@@ -132,24 +131,23 @@
                 lastTransferTime = currentTime;
             }
     
-            // Add the transaction to the sessionStorage
-            let transactionHistory = JSON.parse(sessionStorage.getItem("transactionHistory")) || [];
-    
-            // Create the new transaction entry
-            const newTransaction = {
-                date: new Date().toISOString().split("T")[0], // YYYY-MM-DD
-                recipient: recipient,
-                amount: amount,
-                status: transactionStatus // Include transaction status
+            // Send AJAX request to PHP
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'transfer.php', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.success) {
+                        document.getElementById('successMessage').style.display = 'block';
+                    } else {
+                        document.getElementById('errorMessage').style.display = 'block';
+                        document.getElementById('errorMessage').textContent = response.error || "Transfer failed.";
+                    }
+                }
             };
-    
-            // Add the new transaction to the array
-            transactionHistory.push(newTransaction);
-    
-            // Save the updated history back into sessionStorage
-            sessionStorage.setItem("transactionHistory", JSON.stringify(transactionHistory));
+            xhr.send(`amount=${amount}&recipient=${recipient}&note=${note}&balance=${balance}`);
         });
     </script>
-     
 </body>
 </html>

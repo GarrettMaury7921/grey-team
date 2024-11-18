@@ -124,27 +124,44 @@
     </footer>
 
     <script>
-        // Placeholder variables for username and password
-        const username = sessionStorage.getItem("username") || "User";
-        const password = sessionStorage.getItem("password") || "password123";
-        
-        // Get balance from sessionStorage or set default value if not available
-        let balance = parseFloat(sessionStorage.getItem("balance")) || 1000000;
+        // Function to check if the user is logged in
+        function checkLoginStatus() {
+            // Check if there is sessionStorage data for username and password
+            const username = sessionStorage.getItem("username");
+            const password = sessionStorage.getItem("password");
 
-        // Display the user's info on the dashboard
-        document.getElementById('username').textContent = username;
-        document.getElementById('displayUsername').textContent = username;
-        document.getElementById('displayPassword').textContent = password;
-        document.getElementById('balance').textContent = balance.toLocaleString();
-
-        // Navigate to transfer money page
-        function transferMoney() {
-            window.location.href = "transfer.html";
+            // If no username/password found, redirect to login page
+            if (!username || !password) {
+                window.location.href = "index.html";  // Redirect to login page
+            } else {
+                // Call PHP to fetch user details and balance
+                fetchUserInfo(username, password);
+            }
         }
 
-        // Navigate to transaction history page
-        function viewTransactionHistory() {
-            window.location.href = "transaction_history.html";
+        // Fetch user information and balance from the database
+        function fetchUserInfo(username, password) {
+            // Send an AJAX request to PHP to get user information
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "login.php", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+
+                    if (response.success) {
+                        // If login is successful, display username and balance
+                        document.getElementById('username').textContent = response.username;
+                        document.getElementById('displayUsername').textContent = response.username;
+                        document.getElementById('displayPassword').textContent = password;  // Only for display, not security
+                        document.getElementById('balance').textContent = response.balance.toLocaleString();
+                    } else {
+                        // If authentication fails
+                        window.location.href = "index.html";  // Redirect to login page
+                    }
+                }
+            };
+            xhr.send(`username=${username}&password=${password}`);
         }
 
         // Sign out function: Clears sessionStorage and redirects to index.html
@@ -152,6 +169,19 @@
             sessionStorage.clear();  // Clears all session data
             window.location.href = "index.html";  // Redirect to the login page
         }
+
+        // Function to navigate to transfer money page
+        function transferMoney() {
+            window.location.href = "transfer.html";
+        }
+
+        // Function to navigate to transaction history page
+        function viewTransactionHistory() {
+            window.location.href = "transaction_history.html";
+        }
+
+        // Call checkLoginStatus on page load to ensure the user is logged in
+        checkLoginStatus();
     </script>
 
 </body>
