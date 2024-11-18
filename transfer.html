@@ -53,12 +53,15 @@
             <form id="transferForm">
                 <label for="recipient">Recipient Account:</label><br>
                 <input type="text" id="recipient" required><br><br>
-    
+            
                 <label for="amount">Amount to Transfer:</label><br>
                 <input type="number" id="amount" required><br><br>
-    
+            
                 <input type="submit" value="Transfer">
             </form>
+            
+            <p id="errorMessage" class="alert" style="display:none; color: red;"></p>
+            
     
             <p id="suspiciousWarning" class="alert" style="display:none;">
                 Warning: This transfer is marked as suspicious due to the high amount requested. Cancelled.
@@ -70,6 +73,9 @@
     
             <!-- Styled "Go Back to Dashboard" button -->
             <button class="go-back-btn" onclick="window.location.href = 'dashboard.html';">Go Back to Dashboard</button>
+
+            <p id="errorMessage" class="alert" style="display:none; color: red;"></p>
+            
         </div>
     </div>
     
@@ -81,21 +87,36 @@
         let balance = parseFloat(sessionStorage.getItem("balance")) || 1000000;
         document.getElementById('balance').textContent = balance.toLocaleString();
     
+        // Timer to track last transfer
+        let lastTransferTime = 0; // Store the timestamp of the last successful transfer
+    
         document.getElementById('transferForm').addEventListener('submit', function (e) {
             e.preventDefault();
     
+            const currentTime = Date.now(); // Get the current timestamp
             const recipient = document.getElementById('recipient').value;
             const amount = parseFloat(document.getElementById('amount').value);
+            const errorElement = document.getElementById('errorMessage');
     
-            let transactionStatus = "Completed";  // Default status
+            // Clear any previous error messages
+            errorElement.style.display = 'none';
     
-            if (amount > 20000) {
+            if (currentTime - lastTransferTime < 5000) { // Check if 5 seconds have passed
+                errorElement.textContent = "You must wait at least 5 seconds between transfers.";
+                errorElement.style.display = 'block';
+                return;
+            }
+    
+            let transactionStatus = "Completed"; // Default status
+    
+            if (amount > 25000) {
                 document.getElementById('suspiciousWarning').style.display = 'block';
                 document.getElementById('successMessage').style.display = 'none';
-                transactionStatus = "Cancelled";  // Set status to cancelled for suspicious transactions
+                transactionStatus = "Cancelled"; // Set status to cancelled for suspicious transactions
             } else {
                 if (amount > balance) {
-                    alert("Insufficient funds.");
+                    errorElement.textContent = "Insufficient funds.";
+                    errorElement.style.display = 'block';
                     return;
                 }
     
@@ -106,6 +127,9 @@
                 // Hide warning, show success
                 document.getElementById('suspiciousWarning').style.display = 'none';
                 document.getElementById('successMessage').style.display = 'block';
+    
+                // Update the last transfer time
+                lastTransferTime = currentTime;
             }
     
             // Add the transaction to the sessionStorage
@@ -116,7 +140,7 @@
                 date: new Date().toISOString().split("T")[0], // YYYY-MM-DD
                 recipient: recipient,
                 amount: amount,
-                status: transactionStatus  // Include transaction status
+                status: transactionStatus // Include transaction status
             };
     
             // Add the new transaction to the array
@@ -126,5 +150,6 @@
             sessionStorage.setItem("transactionHistory", JSON.stringify(transactionHistory));
         });
     </script>
+     
 </body>
 </html>
