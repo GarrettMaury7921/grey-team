@@ -271,15 +271,18 @@ footer {
             </div>
             
             <!-- Login Form -->
-            <form action="#" method="post" id="login-form">
+            <form action="login.html" method="post" id="login-form">
+                <!-- Error message (HTML cannot process this, so you'd need JS for error handling) -->
+                <p class="error" style="color: red;" id="error-message"></p>
+        
                 <input type="text" name="username" id="username" placeholder="Username" required>
                 <input type="password" name="password" id="password" placeholder="Password" required>
-                
+        
                 <!-- CAPTCHA Image -->
                 <canvas id="captchaCanvas" width="200" height="80"></canvas>
                 <input type="text" name="captcha" id="captcha" placeholder="Enter CAPTCHA" required>
                 <button type="button" id="refreshCaptcha">Refresh CAPTCHA</button>
-
+        
                 <input type="submit" value="Login">
             </form>
         </div>
